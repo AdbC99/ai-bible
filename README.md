@@ -4,6 +4,8 @@ ai-Bible is a project that explores the use of AI within a context of interpreti
 
 For web accessible front end as a pocket bible see http://ai-bible.com
 
+![Screenshot](https://www.ai-bible.com/ChristLandscape.jpg))
+
 ## mcp-server
 
 The mcp-server contains the current implementation of a server for repeatedly and reliably retrieving bible verses when using LLMs.
