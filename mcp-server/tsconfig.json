@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+      "target": "ES2022",
+      "module": "Node16",
+      "moduleResolution": "Node16",
+      "outDir": "./build",
+      "rootDir": "./src",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      "resolveJsonModule": true, // Allows importing JSON files
+      "allowJs": true,       // Allows JS files in the project
+      // "checkJs": true        // (Optional) Type-checks JS files with JSDoc types
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": [
+        "node_modules",
+        "src/data/**/*",
+        "src/data/**/*.json",
+        "build"
+    ]
+}
