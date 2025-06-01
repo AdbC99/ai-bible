@@ -10,6 +10,10 @@ The mcp-server contains the current implementation of a server for repeatedly an
 
 See the README.md in that subfolder for detailed information.
 
+## Contributing
+
+Contributions are welcome! Please feel free to submit a pull request or open an issue for any enhancements or bug fixes.
+
 ## License
  
  This project source code is under the GNU GPL v3 Licence. Within the project there are dat    a files that come under different licences. See the file LICENCE.md for details of the GPL licence.
