@@ -4,9 +4,8 @@ ai-Bible is a project that explores the use of AI within a context of interpreti
 
 For web accessible front end as a pocket bible see http://ai-bible.com
 
-<div align="center">
-  <img src="https://www.ai-bible.com/ChristLandscape.jpg" alt="Logo" width="200">
-</div>
+<div align="left">
+  <img src="https://www.ai-bible.com/ChristLandscape.jpg" alt="Logo" width="400"
 
 ## mcp-server
 
