@@ -6,6 +6,10 @@ In current state there is one tool that allows bible verses from the Berean tran
 
 There is one tool which allows a user to get verse and supply an Osis reference for that verse, e.g. John.3.16-18
 
+## Bible versions
+
+The text comes from the Berean Study Bible with original language coming from the following manuscript traditions: WLC / Nestle Base TR RP WH NE NA SBL.
+
 ## Installation
 
 To install the necessary dependencies, run:

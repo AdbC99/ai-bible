@@ -30,7 +30,7 @@ function convertUnityLookupToOsisChapter(unityLookups) {
  * @param {string} osisRef - The OSIS reference to convert
  * @returns {number|undefined} The corresponding verse index (1 is Gen.1.1, 2 is Gen.1.2, etc.), or undefined if not found 
  */
-function convertOsisRefToIndex(osisRef) {
+function convertOsisRefToIndex(osisRef) {                    
     return indexConversions.osisRef[osisRef];
 }
 

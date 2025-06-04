@@ -1,6 +1,15 @@
-import { getBibleVerse, getBibleVerses } from "./berean.js";
+import { getBibleVerse, getBibleVerses, getOriginalTextVerse } from "./berean.js";
 
 describe("berean.js", () => {
+    describe("getOriginalTextVerse(s)", () => {
+        test("should return original language verse for valid OSIS reference", () => {
+            const result = getOriginalTextVerse("Gen.1.1").trim();
+            expect(result).toBe(
+                "בְּרֵאשִׁ֖ית אֱלֹהִ֑ים אֵ֥ת בָּרָ֣א הַשָּׁמַ֖יִם וְאֵ֥ת הָאָֽרֶץ׃."
+            );
+        });
+    });
+
     describe("getBibleVerse(s)", () => {
         test("should return verse for valid OSIS reference", () => {
             const result = getBibleVerse("Matt.5.6");
