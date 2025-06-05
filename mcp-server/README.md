@@ -4,7 +4,7 @@ This project contains open source tooling from ai-Bible. Currenty it contains an
 
 In current state there is one tool that allows bible verses from the Berean translation to be utilised.
 
-There is one tool which allows a user to get verse and supply an Osis reference for that verse, e.g. John.3.16-18
+There is one tool which allows a user to get verse and supply an Osis reference for that verse, e.g. John.3.16-18. The verses can be formatted as standard citations like Matt 3:1 and there is some tolerance to be loose with the format.
 
 ## Bible versions
 
