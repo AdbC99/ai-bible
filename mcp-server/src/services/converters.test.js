@@ -329,6 +329,16 @@ describe("convertOsisRangeToOsisRefs", () => {
         expect(result).toEqual(["John.3.16"]);
     });
 
+    test("should handle standard references", () => {
+        const result = converter.convertOsisRangeToOsisRefs("Matt 3:16");
+        expect(result).toEqual(["Matt.3.16"]);
+    });
+
+    test("should handle long book names", () => {
+        const result = converter.convertOsisRangeToOsisRefs("Matthew 3:16-17");
+        expect(result).toEqual(["Matt.3.16", "Matt.3.17"]);
+    });
+
     test("should return a range of verses within the same chapter", () => {
         const result = converter.convertOsisRangeToOsisRefs("John.3.16-18");
         expect(result).toEqual(["John.3.16", "John.3.17", "John.3.18"]);

@@ -1,4 +1,4 @@
-import { getBibleVerse, getBibleVerses, getOriginalTextVerse } from "./berean.js";
+import { getBibleVerse, getBibleVerses, getOriginalTextVerse, getTransliteratedVerse } from "./berean.js";
 
 describe("berean.js", () => {
     describe("getOriginalTextVerse(s)", () => {
@@ -6,6 +6,15 @@ describe("berean.js", () => {
             const result = getOriginalTextVerse("Gen.1.1").trim();
             expect(result).toBe(
                 "בְּרֵאשִׁ֖ית אֱלֹהִ֑ים אֵ֥ת בָּרָ֣א הַשָּׁמַ֖יִם וְאֵ֥ת הָאָֽרֶץ׃."
+            );
+        });
+    });
+
+    describe("getTransliteratedVerse(s)", () => {
+        test("should return transliterated original language verse for valid OSIS reference", () => {
+            const result = getTransliteratedVerse("Gen.1.1").trim();
+            expect(result).toBe(
+                "bə·rê·šîṯ ’ĕ·lō·hîm ’êṯ bā·rā haš·šā·ma·yim wə·’êṯ hā·’ā·reṣ."
             );
         });
     });

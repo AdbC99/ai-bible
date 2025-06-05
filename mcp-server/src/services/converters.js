@@ -1,6 +1,8 @@
 import tables from '../data/clarkson/bible_tables.json' with { type: "json" };
 import indexConversions from '../data/clarkson/index_conversions.json' with { type: "json" };
 import chapterIndexTable from "../data/clarkson/chapter_index.json" with { type: "json" };
+import * as bcv_parser from "bible-passage-reference-parser/js/en_bcv_parser.js";
+var bcv = new bcv_parser.default.bcv_parser();
 
 /**
  * Converts a Unity lookup string to an OSIS chapter reference.
@@ -30,8 +32,10 @@ function convertUnityLookupToOsisChapter(unityLookups) {
  * @param {string} osisRef - The OSIS reference to convert
  * @returns {number|undefined} The corresponding verse index (1 is Gen.1.1, 2 is Gen.1.2, etc.), or undefined if not found 
  */
-function convertOsisRefToIndex(osisRef) {                    
-    return indexConversions.osisRef[osisRef];
+function convertOsisRefToIndex(osisRef) { 
+    if (!osisRef || typeof osisRef !== 'string') return undefined;
+    const ref = bcv.parse(osisRef).osis();                  
+    return indexConversions.osisRef[ref];
 }
 
 /**
@@ -214,8 +218,10 @@ function convertOsisRangeToOsisRefs(osisRefRange) {
         return [];
     }
 
+    const range = bcv.parse(osisRefRange).osis();    
+
     // Expand the OSIS reference range to handle cases like "Gen.1.1-3"
-    const expandedRange = expandOsisRef(osisRefRange);
+    const expandedRange = expandOsisRef(range);
 
     if (!expandedRange || expandedRange.length === 0) {
         return [];
@@ -224,7 +230,7 @@ function convertOsisRangeToOsisRefs(osisRefRange) {
     var refs = expandedRange.split('-');
 
     if (refs.length == 1)
-        return [osisRefRange];
+        return [range];
 
     var start = refs[0].split('.');
     var end = refs[1].split('.');
