@@ -10,7 +10,7 @@ const berean_original = berean_originaltext['bereanOriginalLanguage'];
 /**
  * Retrieves a list of Bible verses based on an OSIS range.
  *
- * @param {string} osisRange - The OSIS range to retrieve verses for (e.g. "Mt 1:1-5")
+ * @param {string} osisRange - The OSIS range to retrieve verses for (e.g. "Matt 1:1-5")
  * @returns {Promise<Verse[]>} A promise resolving to an array of Bible verse objects
  */
 function getBibleVerses(osisRange) {

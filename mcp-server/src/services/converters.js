@@ -218,8 +218,24 @@ function convertOsisRangeToOsisRefs(osisRefRange) {
         return [];
     }
 
-    const range = bcv.parse(osisRefRange).osis();    
+    let range = bcv.parse(osisRefRange).osis(); 
 
+    if (range === null || range === undefined || range === '') {
+        console.error(`Invalid OSIS reference range: ${osisRefRange} - ${range}`);
+        // try adding .1 to see if it is a book reference
+        range = bcv.parse(osisRefRange + '.1').osis();
+        if (range === null || range === undefined || range === '') {
+            console.error(`Invalid OSIS reference range after adding .1: ${osisRefRange} - ${range}`);
+            return [];
+        }
+        else {            
+            const book = range.split('.')[0];
+            const start_chapter = 1;
+            const end_chapter = tables.osisName2osisChapters[book].length;
+            range = `${book}.${start_chapter}-${book}.${end_chapter}`;
+        }
+    }
+    
     // Expand the OSIS reference range to handle cases like "Gen.1.1-3"
     const expandedRange = expandOsisRef(range);
 

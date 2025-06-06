@@ -27,6 +27,11 @@ describe("berean.js", () => {
             );
         });
 
+        test("should return book of Genesis", () => {
+            const result = getBibleVerses("Genesis");
+            expect(result.length).toBe(1533);
+        });
+
         test("should return verse for Genesis reference", () => {
             const result = getBibleVerse("Gen.1.1");
             expect(result).toBe(

@@ -28,25 +28,34 @@ const createServer = (name: string, version: string) => {
  * @param server - The MCP server instance.
  * @returns {McpServer} The updated server with the new tool added.
  */
-const addGetVerseTool = (server: McpServer) => {
+const addGetVersesTool = (server: McpServer) => {
     return server.tool(
-        "get-verse",
-        "Get a Bible verse given a verse reference",
+        "get-verses",
+        "Get a Bible verse given a list of verse references or whole book names",
         {
             /**
-             * A bible verse reference (e.g. John.3.16-17)
+             * A list of bible verse reference (e.g. ["John.3.16-17"], ["John"] or ["John.3.16", "John.3.17"])
              *
              * @type string
              */
-            reference: z.string().describe("A bible verse reference"),
+            reference: z.array(z.string()).describe("A bible verse reference"),
         },
         async ({ reference }) => {
-            const list = getBibleVerses(reference);
+            const verses: Record<string, string[]> = {};
+            if (reference.length > 0) {
+                for (const ref of reference) {
+                    const list = await getBibleVerses(ref);
+                    if (list) {
+                        verses[ref] = list;
+                    }
+                }
+            }
+                
             return {
                 content: [
                     {
                         type: "text",
-                        text: JSON.stringify(list) || "Verse not found",
+                        text: JSON.stringify(verses) || "Verse not found",
                     },
                 ],
             };
@@ -122,7 +131,7 @@ const addTransliteratedVerseTool = (server: McpServer) => {
 const main = async () => {
     const transport = new StdioServerTransport();
     const server = createServer("ai-bible-mcp-server", "1.0.0");
-    addGetVerseTool(server);
+    addGetVersesTool(server);
     addGetOriginalTextVerseTool(server);
     addTransliteratedVerseTool(server);
 

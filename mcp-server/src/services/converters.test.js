@@ -324,6 +324,11 @@ describe("Error Handling", () => {
 });
 
 describe("convertOsisRangeToOsisRefs", () => {
+    test("should return a range for a book", () => {
+        const result = converter.convertOsisRangeToOsisRefs("1John");
+        expect(result[result.length - 1]).toEqual("1John.5.21");
+    });
+
     test("should return a single verse for a single reference", () => {
         const result = converter.convertOsisRangeToOsisRefs("John.3.16");
         expect(result).toEqual(["John.3.16"]);
