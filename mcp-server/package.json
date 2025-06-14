@@ -5,7 +5,7 @@
   "description": "A server implementing the Model Control Protocol (MCP)",
   "main": "src/server.js",
   "bin": {
-    "weather": "./build/index.js"
+    "ai-bible": "./build/sse.js"
   },
   "jest": {
     "preset": "ts-jest/presets/default-esm",
@@ -23,8 +23,8 @@
     }
   },
   "scripts": {
-    "build": "tsc && chmod 755 build/index.js",
-    "start": "node ./src/index.ts",
+    "build": "tsc && chmod 755 build/mcp-server-stdio.js",
+    "start": "node ./build/mcp-server-sse.js",
     "test": "node --experimental-vm-modules ./node_modules/.bin/jest --config jest.config.js"
   },
   "files": [
@@ -32,13 +32,18 @@
   ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.11.1",
+    "axios": "^1.9.0",
     "bible-passage-reference-parser": "^3.0.0",
     "body-parser": "^1.19.0",
-    "express": "^4.17.1",
+    "cors": "^2.8.5",
+    "eventsource": "^4.0.0",
+    "express": "^4.21.2",
     "nodemon": "^3.1.10",
     "zod": "^3.24.4"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.15.17",
     "jest": "^29.7.0",
