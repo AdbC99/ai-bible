@@ -32,12 +32,12 @@ npm test
 
 To test the mcp-server without an LLM you can use:
 ```
-npx @modelcontextprotocol/inspector node build/index.js
+npx @modelcontextprotocol/inspector node build/mcp-server-stdio.js
 ```
 
 For testing local mcp-server usage you can configure it to use this path via stdio:
 ```
-[ABSOLUTE PATH TO]/mcp-server/build/index.js
+[ABSOLUTE PATH TO]/mcp-server/build/mcp-server-stdio.js
 ```
 
 To start the MCP server, execute the following command:
