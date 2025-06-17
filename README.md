@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/adbc99-ai-bible-badge.png)](https://mseep.ai/app/adbc99-ai-bible)
+
 # ai-Bible
 
 ai-Bible is a project that explores the use of AI within a context of interpreting and understanding biblical text. Starting with an mcp-server for repeatably using defined bible data with LLMs.
