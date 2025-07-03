@@ -1,4 +1,4 @@
-import { getBibleVerse, getBibleVerses, getOriginalTextVerse, getTransliteratedVerse } from "./berean.js";
+import { getBibleVerse, getBibleVerses, getListBibleVerses, getOriginalTextVerse, getTransliteratedVerse } from "./berean.js";
 
 describe("berean.js", () => {
     describe("getOriginalTextVerse(s)", () => {
@@ -82,6 +82,68 @@ describe("berean.js", () => {
         test("should return null for null reference", () => {
             const result = getBibleVerse(null);
             expect(result).toBeNull();
+        });
+
+        test("list should return verses for Genesis references expanded", () => {
+            const result = getListBibleVerses(["Gen.1.1-Gen.1.3","Gen.1.1-5"]);
+            expect(result.length).toBe(8);
+        });
+
+        test("list should return verses for Genesis references expanded with original language", () => {
+            const result = getListBibleVerses(["Gen.1.1-Gen.1.2","Gen.1.1-2"], "hebrew");
+            expect(result).toStrictEqual([
+                "בְּרֵאשִׁ֖ית אֱלֹהִ֑ים אֵ֥ת בָּרָ֣א הַשָּׁמַ֖יִם וְאֵ֥ת הָאָֽרֶץ׃.", "וְהָאָ֗רֶץ הָיְתָ֥ה תֹ֙הוּ֙ וָבֹ֔הוּ וְחֹ֖שֶׁךְ עַל־ פְּנֵ֣י תְה֑וֹם וְר֣וּחַ אֱלֹהִ֔ים מְרַחֶ֖פֶת עַל־ פְּנֵ֥י הַמָּֽיִם׃.", "בְּרֵאשִׁ֖ית אֱלֹהִ֑ים אֵ֥ת בָּרָ֣א הַשָּׁמַ֖יִם וְאֵ֥ת הָאָֽרֶץ׃.", "וְהָאָ֗רֶץ הָיְתָ֥ה תֹ֙הוּ֙ וָבֹ֔הוּ וְחֹ֖שֶׁךְ עַל־ פְּנֵ֣י תְה֑וֹם וְר֣וּחַ אֱלֹהִ֔ים מְרַחֶ֖פֶת עַל־ פְּנֵ֥י הַמָּֽיִם׃."
+            ]);
+        });
+
+        test("list should return verses for Genesis references with original language", () => {
+            const result = getListBibleVerses(["Genesis 1:1","Genesis 1:2"], "hebrew");
+            expect(result).toStrictEqual([
+                "בְּרֵאשִׁ֖ית אֱלֹהִ֑ים אֵ֥ת בָּרָ֣א הַשָּׁמַ֖יִם וְאֵ֥ת הָאָֽרֶץ׃.", 
+                "וְהָאָ֗רֶץ הָיְתָ֥ה תֹ֙הוּ֙ וָבֹ֔הוּ וְחֹ֖שֶׁךְ עַל־ פְּנֵ֣י תְה֑וֹם וְר֣וּחַ אֱלֹהִ֔ים מְרַחֶ֖פֶת עַל־ פְּנֵ֥י הַמָּֽיִם׃."
+            ]);
+        });
+
+        
+
+        test("list should return verses for a single verse range", () => {
+            const result = getListBibleVerses("Gen.1.1-5");
+            expect(result.length).toBe(5);
+        });
+
+        
+        test("list should return verses for a single verse range of stringifyed json", () => {
+            const result = getListBibleVerses(`[\"Gen.1.1\", \"Gen.2.1\"]`, "hebrew");
+            expect(result).toStrictEqual([
+                "בְּרֵאשִׁ֖ית אֱלֹהִ֑ים אֵ֥ת בָּרָ֣א הַשָּׁמַ֖יִם וְאֵ֥ת הָאָֽרֶץ׃.", 
+                "הַשָּׁמַ֥יִם וְהָאָ֖רֶץ וַיְכֻלּ֛וּ וְכָל־ צְבָאָֽם׃."
+            ]);
+        });
+
+        test("list should return verses for a single verse range of stringifyed json 2", () => {
+            const result = getListBibleVerses("[\\\"Gen.1.1\\\", \\\"Gen.2.1\\\"]", "hebrew");
+            expect(result).toStrictEqual([
+                "בְּרֵאשִׁ֖ית אֱלֹהִ֑ים אֵ֥ת בָּרָ֣א הַשָּׁמַ֖יִם וְאֵ֥ת הָאָֽרֶץ׃.", 
+                "הַשָּׁמַ֥יִם וְהָאָ֖רֶץ וַיְכֻלּ֛וּ וְכָל־ צְבָאָֽם׃."
+            ]);
+        });
+
+        test("list should return null for null reference", () => {
+            const result = getListBibleVerses(null);
+            expect(result).toBeNull();
+        });
+
+        test("list should recognise when a verse has been split unnecessarily by the llm", () => {
+            const result = getListBibleVerses(`[[\"Phlm\", \"1\"]]`, "hebrew");
+            expect(result.length).toStrictEqual(25);
+        });
+
+        test("list should return verses for a single verse range of nested json", () => {
+            const result = getListBibleVerses("[[\\\"Gen.1.1\\\", \\\"Gen.2.1\\\"]]", "hebrew");
+            expect(result).toStrictEqual([
+                "בְּרֵאשִׁ֖ית אֱלֹהִ֑ים אֵ֥ת בָּרָ֣א הַשָּׁמַ֖יִם וְאֵ֥ת הָאָֽרֶץ׃.", 
+                "הַשָּׁמַ֥יִם וְהָאָ֖רֶץ וַיְכֻלּ֛וּ וְכָל־ צְבָאָֽם׃."
+            ]);
         });
     });
 });

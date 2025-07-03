@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { addGetVersesTool, addGetOriginalTextVerseTool, addTransliteratedVerseTool } from "./mcp-server-tools.js";
+import { addGetBibleVerses, addGetBibleVersesOriginalOnly } from "./mcp-server-tools.js";
 
 /**
  * Creates a new instance of the MCP server.
@@ -24,9 +24,7 @@ const createServer = (name: string, version: string) => {
 const main = async () => {
     const transport = new StdioServerTransport();
     const server = createServer("ai-bible-mcp-server", "1.0.0");
-    addGetVersesTool(server);
-    addGetOriginalTextVerseTool(server);
-    addTransliteratedVerseTool(server);
+    addGetBibleVerses(server);
 
     await server.connect(transport);
     console.error("MCP Server running on stdio");

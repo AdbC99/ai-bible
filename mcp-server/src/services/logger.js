@@ -35,6 +35,19 @@ const logger = {
      * Logs an information level message.
      * @memberof logger
      * @instance
+     * @method info
+     * @static
+     * @param {string} message - The message to be logged.
+     */
+    debug: (message) => {
+        if (process.env.DEBUG)
+            log(`DEBUG: ${JSON.stringify(message)}\n`);
+    },
+
+    /**
+     * Logs an information level message.
+     * @memberof logger
+     * @instance
      * @method error
      * @static
      * @param {string} message - The message to be logged.

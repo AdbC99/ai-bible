@@ -2,9 +2,7 @@ import express, { Request, Response } from "express";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import {
-    addGetVersesTool,
-    addGetOriginalTextVerseTool,
-    addTransliteratedVerseTool,
+    addGetBibleVerses,
 } from "./mcp-server-tools.js";
 
 const app = express();
@@ -61,9 +59,7 @@ app.get("/mcp", async (req: Request, res: Response) => {
 
         // Connect the transport to the MCP server
         const server = createServer("ai-bible-mcp-server", "1.0.0");
-        addGetVersesTool(server);
-        addGetOriginalTextVerseTool(server);
-        addTransliteratedVerseTool(server);
+        addGetBibleVerses(server);
         await server.connect(transport);
 
         console.log(`Established SSE stream with session ID: ${sessionId}`);

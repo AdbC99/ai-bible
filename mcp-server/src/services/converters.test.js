@@ -55,6 +55,11 @@ describe("converters.js", () => {
             expect(result).toBe(23240);
         });
 
+        test("should convert valid OSIS reference to index with escape chars", () => {
+            const result = converter.convertOsisRefToIndex("\\Matt.5.6\\");
+            expect(result).toBe(23240);
+        });
+
         test("should convert Genesis reference to index", () => {
             const result = converter.convertOsisRefToIndex("Gen.1.1");
             expect(result).toBe(0);
@@ -341,6 +346,11 @@ describe("convertOsisRangeToOsisRefs", () => {
 
     test("should handle long book names", () => {
         const result = converter.convertOsisRangeToOsisRefs("Matthew 3:16-17");
+        expect(result).toEqual(["Matt.3.16", "Matt.3.17"]);
+    });
+
+    test("should handle escape characters", () => {
+        const result = converter.convertOsisRangeToOsisRefs("\\Matthew 3:16-17\\");
         expect(result).toEqual(["Matt.3.16", "Matt.3.17"]);
     });
 
