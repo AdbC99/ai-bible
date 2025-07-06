@@ -1,13 +1,13 @@
 
 # Get Bible Verses
 
-Take a loosley formed list of one or more bible verses e.g"
+Take a loosley formed list of one or more bible verses e.g:
 
 ``` json
 [ "Gen.1.1-5", "Mark 1", "Heb.1.1-Heb.1.5"]
 ``` 
 
-and either parse them into a list of osisReferences or retrieve the bible text using the bearean translation in either english, hebrew or greek. e.g.:
+and retrieve the bible text using the bearean translation in either english, hebrew or greek. e.g.:
 
 ``` json
 [
@@ -74,3 +74,7 @@ console.log(transliteration);
 const hebrewVerses = getListBibleVerses(["Gen.1.1-2"], "original-language");
 const greekVerses = getListBibleVerses(["Matt.1.1"], "greek");
 ```
+
+## Licence
+
+This project is licensed under the MIT License.
