@@ -33,13 +33,13 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.11.1",
     "axios": "^1.9.0",
-    "bible-passage-reference-parser": "^3.0.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "eventsource": "^4.0.0",
     "express": "^4.21.2",
     "nodemon": "^3.1.10",
-    "zod": "^3.24.4"
+    "zod": "^3.24.4",
+    "@ai-bible/bible-verses": "file:../bible-verses"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

@@ -1,9 +1,7 @@
 import {
     getBibleVerses,
     getListBibleVerses,
-    getOriginalTextVerses,
-    getTransliteratedVerses,
-} from "./services/berean.js";
+} from "../../bible-help/get-bible-verses/index.js";
 import logger from "./services/logger.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
@@ -118,6 +116,4 @@ export {
     addGetBibleVersesOriginalOnly,
     getBibleVerses,
     getListBibleVerses,
-    getOriginalTextVerses,
-    getTransliteratedVerses,
 };

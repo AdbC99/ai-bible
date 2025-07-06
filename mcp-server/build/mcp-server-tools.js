@@ -1,4 +1,4 @@
-import { getBibleVerses, getListBibleVerses, getOriginalTextVerses, getTransliteratedVerses, } from "./services/berean.js";
+import { getBibleVerses, getListBibleVerses, getOriginalTextVerses, getTransliteratedVerses, } from "../../bible-help/get-bible-verses/index.js";
 import logger from "./services/logger.js";
 import { z } from "zod";
 /**
@@ -38,7 +38,7 @@ const addGetBibleVerses = (server) => {
             content: [
                 {
                     type: "text",
-                    text: versesOut || "Verse not found",
+                    text: JSON.stringify(versesOut) || "Verse not found",
                 },
             ],
         };
@@ -73,7 +73,7 @@ const addGetBibleVersesOriginalOnly = (server) => {
             content: [
                 {
                     type: "text",
-                    text: versesOut || "Verse not found",
+                    text: JSON.stringify(versesOut) || "Verse not found",
                 },
             ],
         };
