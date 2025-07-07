@@ -1,6 +1,6 @@
 {
   "name": "@bible-help/parse-bible-verses",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Bible verse parsing services for AI Bible applications",
   "repository": "https://github.com/AdbC99/ai-bible",
   "homepage": "http://ai-bible.com/labs",
@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@bible-help/bible-book-data": "^1.0.2",
+    "@bible-help/chapters-and-verses-in-bible-books": "^1.0.0",
     "bible-passage-reference-parser": "^3.0.0"
   },
   "devDependencies": {

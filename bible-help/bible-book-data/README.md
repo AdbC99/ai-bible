@@ -43,7 +43,7 @@ import { isValidOsisBook, bookNameToOsisBook, osisBookToBookName, getAllOsisBook
 // Replace book names in string with osis formatted names
 const withOsis = replaceBookNamesWithOsis("Read from Genesis:1");
 console.log(withOsis)
-// Output: "Read from Gen.1"
+// Output: "Read from Gen:1"
 
 // Retrieve osis formatted book name
 const osisName = bookNameToOsisBook("Genesis.3.16");

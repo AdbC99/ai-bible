@@ -62,6 +62,31 @@ describe("parser.js", () => {
             const result = expandOsisRef("John.3.16-John.3.18");
             expect(result).toBe("John.3.16-John.3.18");
         });
+
+        test("should expand single book name to full book range", () => {
+            const result = expandOsisRef("Gen");
+            expect(result).toBe("Gen.1.1-Gen.50.26");
+        });
+
+        test("should expand single book name for shorter book", () => {
+            const result = expandOsisRef("Jude");
+            expect(result).toBe("Jude.1.1-Jude.1.25");
+        });
+
+        test("should expand single book name for multi-chapter book", () => {
+            const result = expandOsisRef("Matt");
+            expect(result).toBe("Matt.1.1-Matt.28.20");
+        });
+
+        test("should return null for invalid book name", () => {
+            const result = expandOsisRef("InvalidBook");
+            expect(result).toBeNull();
+        });
+
+        test("should return null for empty string", () => {
+            const result = expandOsisRef("");
+            expect(result).toBeNull();
+        });
     });
 
     describe("convertOsisRangeToOsisRefs", () => {

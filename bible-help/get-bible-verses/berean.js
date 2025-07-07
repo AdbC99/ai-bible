@@ -1,9 +1,9 @@
 import berean_verses from "./data/berean/berean_verses.json" with { type: "json" };
 import berean_originaltext from "./data/berean/berean_originaltext.json" with { type: "json" };
 import berean_transliteration from "./data/berean/berean_transliteration.json" with { type: "json" };
-import { convertOsisRefToIndex } from "./converters.js";
 import logger from "./logger.js";
 import { parseBibleVerses } from "@bible-help/parse-bible-verses";
+import { getIndexFromOsisRef } from "@bible-help/chapters-and-verses-in-bible-books";
 
 const berean_translit = berean_transliteration['berean-transliteration'];
 const berean_original = berean_originaltext['berean-original-language'];
@@ -96,7 +96,7 @@ function getTransliteratedVerses(osisRange) {
  * @returns {string|null} A bible verse as text, or null if not found
  */
 function getBibleVerse(osisRef, language = "english") {
-    const index = convertOsisRefToIndex(osisRef);
+    const index = getIndexFromOsisRef(osisRef);
 
     switch (language.toLowerCase()) {
         case "english":
@@ -120,7 +120,7 @@ function getBibleVerse(osisRef, language = "english") {
  * @returns {string|null} A bible verse as text, or null if not found
  */
 function getOriginalTextVerse(osisRef) {
-    const index = convertOsisRefToIndex(osisRef);
+    const index = getIndexFromOsisRef(osisRef);
     let verse = berean_original[index] || null;
 
     if (verse)
@@ -136,7 +136,7 @@ function getOriginalTextVerse(osisRef) {
  * @returns {string|null} A bible verse as text, or null if not found
  */
 function getTransliteratedVerse(osisRef) {
-    const index = convertOsisRefToIndex(osisRef);
+    const index = getIndexFromOsisRef(osisRef);
     let verse = berean_translit[index] || null;
 
     if (verse)

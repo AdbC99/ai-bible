@@ -1,8 +1,10 @@
-import tables from './data/clarkson/bible_tables.json' with { type: "json" };
 import indexConversions from './data/clarkson/index_conversions.json' with { type: "json" };
-import chapterIndexTable from "./data/clarkson/chapter_index.json" with { type: "json" };
 import { isValidOsisBook, replaceBookNamesWithOsis } from "@bible-help/bible-book-data";
 import logger from "./logger.js";
+import { 
+    getChaptersInBook, 
+    getVersesInChapter
+} from "@bible-help/chapters-and-verses-in-bible-books";
 import * as bcv_parser from "bible-passage-reference-parser/js/en_bcv_parser.js";
 var bcv = new bcv_parser.default.bcv_parser();
 
@@ -15,7 +17,8 @@ function convertOsisChapterToOsisRefs(osisChapter) {
     osisChapter = replaceBookNamesWithOsis(osisChapter); // Ensure osisChapter is in the correct format
 
     const chapterIndex = indexConversions.osisChapter[osisChapter];
-    const versesFound = chapterIndexTable.versePerChapter[osisChapter];
+    const [book, chapter] = osisChapter.split('.');
+    const versesFound = getVersesInChapter(book, parseInt(chapter));
 
     if (!versesFound) {
         logger.error(`Unrecognised chapter: ${osisChapter} ${chapterIndex}`);
@@ -82,7 +85,7 @@ function expandOsisRef(osisRef) {
         if (!/^\d{1,2}$/.test(endChapter)) // If endChapter is not a valid number, assume it's a book and the same as startChapter
         {
             endChapter = verseRange;
-            endVerse = convertOsisChapterToOsisRefs(book + '.' + endChapter).length;
+            endVerse = getVersesInChapter(book, parseInt(endChapter));
         }
 
         const expanded = `${book}.${startChapter}.${startVerse}-${book}.${endChapter}.${endVerse}`;
@@ -97,7 +100,7 @@ function expandOsisRef(osisRef) {
         const [book, startChapter] = parts;
         const startVerse = 1; // Default to verse 1 if not specified
         const endChapter = startChapter; // Default to start chapter if not specified
-        const endVerse = convertOsisChapterToOsisRefs(osisRef).length
+        const endVerse = getVersesInChapter(book, parseInt(startChapter))
         const expanded = `${book}.${startChapter}.${startVerse}-${book}.${endChapter}.${endVerse}`;
         return expanded;
     } else if (parts.length === 1) {
@@ -107,8 +110,8 @@ function expandOsisRef(osisRef) {
             logger.error(`Invalid OSIS book: ${book}`);
             return null;
         }
-        // TODO: Get proper end chapter and verse for the book
-        return `${book}.1.1-${book}.1.${convertOsisChapterToOsisRefs(book + '.1').length}`;
+        const lastChapter = getChaptersInBook(book)
+        return `${book}.1.1-${book}.${lastChapter}.${getVersesInChapter(book, lastChapter)}`;
     }
 
     return null;
@@ -143,7 +146,7 @@ function convertOsisRangeToOsisRefs(osisRefRange) {
         else {            
             const book = range.split('.')[0];
             const start_chapter = 1;
-            const end_chapter = tables.osisName2osisChapters[book].length;
+            const end_chapter = getChaptersInBook(book);
             range = `${book}.${start_chapter}-${book}.${end_chapter}`;
         }
     }

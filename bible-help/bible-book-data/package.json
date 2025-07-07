@@ -1,6 +1,6 @@
 {
   "name": "@bible-help/bible-book-data",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Bible verse services for AI Bible applications",
   "repository": "https://github.com/AdbC99/ai-bible",
   "homepage": "http://ai-bible.com/labs",
