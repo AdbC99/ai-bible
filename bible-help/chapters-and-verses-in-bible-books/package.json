@@ -1,7 +1,7 @@
 {
   "name": "@bible-help/chapters-and-verses-in-bible-books",
-  "version": "1.0.0",
-  "description": "Bible verse services for AI Bible applications",
+  "version": "1.0.1",
+  "description": "Get the chapters and verses in each book / chapter of the Bible, and the index for each verse.",
   "repository": "https://github.com/AdbC99/ai-bible",
   "homepage": "http://ai-bible.com/labs",
   "main": "index.js",

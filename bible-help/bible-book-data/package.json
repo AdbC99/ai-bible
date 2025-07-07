@@ -1,7 +1,7 @@
 {
   "name": "@bible-help/bible-book-data",
-  "version": "1.0.3",
-  "description": "Bible verse services for AI Bible applications",
+  "version": "1.0.4",
+  "description": "Get the books of the Bible, their OSIS codes, and their chapters and verses.",
   "repository": "https://github.com/AdbC99/ai-bible",
   "homepage": "http://ai-bible.com/labs",
   "main": "index.js",

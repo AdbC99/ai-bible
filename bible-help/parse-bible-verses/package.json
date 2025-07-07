@@ -1,7 +1,7 @@
 {
   "name": "@bible-help/parse-bible-verses",
-  "version": "1.0.5",
-  "description": "Bible verse parsing services for AI Bible applications",
+  "version": "1.0.6",
+  "description": "Parse text and expand osis references for Bible verses for use with AI and human interactions",
   "repository": "https://github.com/AdbC99/ai-bible",
   "homepage": "http://ai-bible.com/labs",
   "main": "index.js",

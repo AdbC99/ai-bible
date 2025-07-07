@@ -1,7 +1,7 @@
 {
   "name": "@bible-help/get-bible-verses",
-  "version": "1.0.11",
-  "description": "Bible verse services for AI Bible applications",
+  "version": "1.0.12",
+  "description": "Get bible verses from the Berean Bible in english, original text, or transliteration.",
   "repository": "https://github.com/AdbC99/ai-bible",
   "homepage": "http://ai-bible.com/labs",
   "main": "index.js",
