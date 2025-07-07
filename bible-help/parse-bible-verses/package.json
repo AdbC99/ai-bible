@@ -10,6 +10,7 @@
     "test": "node --experimental-vm-modules ./node_modules/.bin/jest --config jest.config.js"
   },
   "dependencies": {
+    "@bible-help/bible-book-data": "^1.0.2",
     "bible-passage-reference-parser": "^3.0.0"
   },
   "devDependencies": {

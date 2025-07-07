@@ -70,6 +70,8 @@ export function replaceBookNamesWithOsis(text) {
     if (!text) {
         return text;
     }
+
+    text = text + ""; // convert to string if not already
     
     let result = text;
     const bookNames = getAllBookNames();

@@ -1,19 +1,18 @@
 import tables from './data/clarkson/bible_tables.json' with { type: "json" };
 import indexConversions from './data/clarkson/index_conversions.json' with { type: "json" };
 import chapterIndexTable from "./data/clarkson/chapter_index.json" with { type: "json" };
+import { isValidOsisBook, replaceBookNamesWithOsis } from "@bible-help/bible-book-data";
 import logger from "./logger.js";
 import * as bcv_parser from "bible-passage-reference-parser/js/en_bcv_parser.js";
 var bcv = new bcv_parser.default.bcv_parser();
 
 /**
  * Converts an OSIS chapter to a list of verses.
- *
  * @param {string} osisChapter - The OSIS chapter reference
  * @returns {string[]} The list of verse numbers as OSIS references
  */
 function convertOsisChapterToOsisRefs(osisChapter) {
-    
-    osisChapter = osisChapter.replace('Psa', "Ps").replace('Pss', 'Ps');
+    osisChapter = replaceBookNamesWithOsis(osisChapter); // Ensure osisChapter is in the correct format
 
     const chapterIndex = indexConversions.osisChapter[osisChapter];
     const versesFound = chapterIndexTable.versePerChapter[osisChapter];
@@ -43,6 +42,8 @@ function convertOsisChapterToOsisRefs(osisChapter) {
  * @returns {string} The expanded OSIS reference with verse ranges (e.g., "Gen.1.1-Gen.1.3")
  */
 function expandOsisRef(osisRef) {
+    osisRef = replaceBookNamesWithOsis(osisRef); // Ensure osisRef is in the correct format
+
     const parts = osisRef.split('.');
 
     // check if osis book is valid
@@ -50,7 +51,7 @@ function expandOsisRef(osisRef) {
 
     logger.debug(`Expanding OSIS reference: ${osisRef} with parts: ${JSON.stringify(parts)} found book: ${book}`);
 
-    if (!tables.osis2bookCode[book]) return null;
+    if (!isValidOsisBook(book)) return null;
 
     if (parts.length === 5)
     {
@@ -102,7 +103,7 @@ function expandOsisRef(osisRef) {
     } else if (parts.length === 1) {
         // If only the book is provided, assume the first chapter and verse
         const book = parts[0];
-        if (!tables.osis2bookCode[book]) {
+        if (!isValidOsisBook(book)) {
             logger.error(`Invalid OSIS book: ${book}`);
             return null;
         }
@@ -124,6 +125,7 @@ function convertOsisRangeToOsisRefs(osisRefRange) {
         return [];
     } 
 
+    osisRefRange = replaceBookNamesWithOsis(osisRefRange); // Ensure osisRefRange is in the correct format
     osisRefRange = osisRefRange.split('\\').join("").trim(); // Clean off escape characters and trim whitespace
 
     let range = bcv.parse(osisRefRange).osis(); 

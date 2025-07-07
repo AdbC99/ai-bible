@@ -178,5 +178,16 @@ describe("parser.js", () => {
             const result = convertOsisRangeToOsisRefs(null);
             expect(result).toEqual([]);
         });
+
+        test("should handle non osis formatted book names correctly", () => {
+            const result = convertOsisRangeToOsisRefs("Genesis.3-3.2");
+            expect(result).toEqual([
+                "Gen.3.1",
+                "Gen.3.2",
+            ]);
+            expect(convertOsisRangeToOsisRefs("Pss.3-3.1")).toEqual(["Ps.3.1"]);
+            expect(convertOsisRangeToOsisRefs("psalms.3-3.1")).toEqual(["Ps.3.1"]);
+            expect(convertOsisRangeToOsisRefs("genessis.3-3.1")).toEqual(["Gen.3.1"]);
+        });
     });
 });
