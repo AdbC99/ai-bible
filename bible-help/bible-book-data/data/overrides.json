@@ -1,0 +1,30 @@
+{
+    "overrides": {
+        "1corinthians": "1Cor",
+        "2corinthians": "2Cor",
+        "1thesalonians": "1Thess",
+        "2thesalonians": "2Thess",
+        "1timothy": "1Tim",
+        "2timothy": "2Tim",
+        "jn": "John",
+        "johns": "John",
+        "1jn": "1John",
+        "2jn": "2John",
+        "3jn": "3John",
+        "philipians": "Phil",
+        "phillipians": "Phil",
+        "philippians": "Phil",
+        "phillippians": "Phil",
+        "acts of the apostles": "Acts",
+        "acts of apostles": "Acts",
+        "acts of the apostles (acts)": "Acts",
+        "acts of apostles (acts)": "Acts",
+        "act": "Acts",
+        "pss": "Ps",
+        "psalms": "Ps",
+        "psa": "Ps",
+        "james": "Jas",
+        "jam": "Jas",
+        "genessis": "Gen"
+    }
+}
