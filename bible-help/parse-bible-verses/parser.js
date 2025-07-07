@@ -1,5 +1,5 @@
 import indexConversions from './data/clarkson/index_conversions.json' with { type: "json" };
-import { isValidOsisBook, replaceBookNamesWithOsis } from "@bible-help/bible-book-data";
+import { isValidOsisBook, replaceBookNamesWithOsis, bookNameToOsisBook } from "@bible-help/bible-book-data";
 import logger from "./logger.js";
 import { 
     getChaptersInBook, 
@@ -7,6 +7,28 @@ import {
 } from "@bible-help/chapters-and-verses-in-bible-books";
 import * as bcv_parser from "bible-passage-reference-parser/js/en_bcv_parser.js";
 var bcv = new bcv_parser.default.bcv_parser();
+
+/**
+ * Checks if a book name is recognised in any format (OSIS, full name, abbreviation, or override).
+ * This is more permissive than isValidOsisBook and can handle various book name formats.
+ * 
+ * @param {string} bookName - The book name to check
+ * @returns {boolean} True if the book name is recognised, false otherwise
+ */
+function isRecognisedBook(bookName) {
+    if (!bookName || typeof bookName !== 'string') {
+        return false;
+    }
+
+    // First check if it's already a valid OSIS book
+    if (isValidOsisBook(bookName)) {
+        return true;
+    }
+
+    // Use bookNameToOsisBook to see if we can convert it to a valid OSIS book
+    const osisBook = bookNameToOsisBook(bookName);
+    return osisBook !== null && isValidOsisBook(osisBook);
+}
 
 /**
  * Converts an OSIS chapter to a list of verses.
@@ -106,12 +128,14 @@ function expandOsisRef(osisRef) {
     } else if (parts.length === 1) {
         // If only the book is provided, assume the first chapter and verse
         const book = parts[0];
-        if (!isValidOsisBook(book)) {
-            logger.error(`Invalid OSIS book: ${book}`);
+        if (!isRecognisedBook(book)) {
+            logger.error(`Invalid or unrecognised book: ${book}`);
             return null;
         }
-        const lastChapter = getChaptersInBook(book)
-        return `${book}.1.1-${book}.${lastChapter}.${getVersesInChapter(book, lastChapter)}`;
+        // Convert to OSIS format if needed
+        const osisBook = bookNameToOsisBook(book) || book;
+        const lastChapter = getChaptersInBook(osisBook)
+        return `${osisBook}.1.1-${osisBook}.${lastChapter}.${getVersesInChapter(osisBook, lastChapter)}`;
     }
 
     return null;
@@ -337,14 +361,14 @@ function processArrayItems(items) {
 }
 
 /**
- * Parses Bible verse ranges and returns the corresponding list of verses.
+ * Expands Bible verse ranges and returns the corresponding list of verses.
  *
- * @param {Array<string>} listOsisRanges - The lists of OSIS ranges to parse (e.g. ["Matt 1:1-5","Gen.1.1"])
+ * @param {Array<string>} listOsisRanges - The lists of OSIS ranges to expand (e.g. ["Matt 1:1-5","Gen.1.1"])
  * @param {string} language - The language for parsing (default: "english")
  * @returns {Array<string>|null} Array of verses or null if invalid input
  */
-function parseBibleVerses(listOsisRanges, language = "english") {
-    logger.info(`parseBibleVerses called with: ${listOsisRanges} and language: ${language} type: ${typeof listOsisRanges} ${Array.isArray(listOsisRanges)}`);
+function expandBibleVerses(listOsisRanges, language = "english") {
+    logger.info(`expandBibleVerses called with: ${listOsisRanges} and language: ${language} type: ${typeof listOsisRanges} ${Array.isArray(listOsisRanges)}`);
 
     // Normalize input to array in case it wasn't called with an array
     let normalizedRanges = normalizeInputToArray(listOsisRanges);
@@ -376,10 +400,240 @@ function parseBibleVerses(listOsisRanges, language = "english") {
     return indexes;
 }
 
+/**
+ * Parses text for Bible verse references and replaces them with OSIS formatted references.
+ * Uses custom recognition first for broader book name support, then bcv parser as fallback.
+ * 
+ * @param {string} text - The text to parse for Bible verse references
+ * @returns {Object} - Object containing 'text' (processed text) and 'references' (array of OSIS references found)
+ */
+function parseTextForBibleVerses(text) {
+    if (!text || typeof text !== 'string') {
+        return { text: text, references: [] };
+    }
+
+    let result = text;
+    const processedRanges = new Set(); // Track what we've already processed
+    const foundReferences = []; // Track all OSIS references found
+    
+    // Step 1: Use comprehensive patterns with isRecognisedBook and parseBibleVerses first
+    const customPatterns = [
+        // Numbered book followed by chapter:verse-verse (e.g., "1 John 2:1", "2 Cor 3:16-18")
+        /\b(\d+\s+[A-Za-z]+(?:\s+[A-Za-z]+)*)\s+(\d+):(\d+)(?:-(\d+))?/g,
+        // Book name followed by chapter:verse-verse (e.g., "John 3:16-18", "Genesis 1:1-3")
+        /\b([A-Za-z]+(?:\s+[A-Za-z]+)*)\s+(\d+):(\d+)(?:-(\d+))?/g,
+        // Numbered book followed by chapter.verse-verse (e.g., "1 John 2.1", "2 Cor 3.16-18")
+        /\b(\d+\s+[A-Za-z]+(?:\s+[A-Za-z]+)*)\s+(\d+)\.(\d+)(?:-(\d+))?/g,
+        // Book name followed by chapter.verse-verse (e.g., "John 3.16-18", "Gen 1.1-3")
+        /\b([A-Za-z]+(?:\s+[A-Za-z]+)*)\s+(\d+)\.(\d+)(?:-(\d+))?/g,
+        // Numbered book followed by chapter:verse-chapter:verse (e.g., "1 John 3:16-4:2")
+        /\b(\d+\s+[A-Za-z]+(?:\s+[A-Za-z]+)*)\s+(\d+):(\d+)-(\d+):(\d+)/g,
+        // Book name followed by chapter:verse-chapter:verse (e.g., "John 3:16-4:2")
+        /\b([A-Za-z]+(?:\s+[A-Za-z]+)*)\s+(\d+):(\d+)-(\d+):(\d+)/g,
+        // Numbered book followed by chapter.verse-chapter.verse (e.g., "1 John 3.16-4.2")
+        /\b(\d+\s+[A-Za-z]+(?:\s+[A-Za-z]+)*)\s+(\d+)\.(\d+)-(\d+)\.(\d+)/g,
+        // Book name followed by chapter.verse-chapter.verse (e.g., "John 3.16-4.2")
+        /\b([A-Za-z]+(?:\s+[A-Za-z]+)*)\s+(\d+)\.(\d+)-(\d+)\.(\d+)/g,
+        // Numbered book followed by chapter (e.g., "1 John 3", "2 Chronicles 1")
+        /\b(\d+\s+[A-Za-z]+(?:\s+[A-Za-z]+)*)\s+(\d+)(?!\s*[:.]\d)/g,
+        // Book name followed by chapter (e.g., "John 3", "Genesis 1")
+        /\b([A-Za-z]+(?:\s+[A-Za-z]+)*)\s+(\d+)(?!\s*[:.]\d)/g,
+        // Standalone book names including misspellings (e.g., "Genesis", "Psalms", "genessis")
+        /\b([A-Za-z]+(?:\s+[A-Za-z]+)*)\b(?=\s|$|[.,;!?])/g
+    ];
+    
+    logger.debug(`Custom patterns processing text: "${text}"`);
+    
+    // Collect all potential matches first, then process the best ones
+    const allMatches = [];
+    
+    for (let i = 0; i < customPatterns.length; i++) {
+        const pattern = customPatterns[i];
+        let match;
+        pattern.lastIndex = 0; // Reset regex state
+        while ((match = pattern.exec(text)) !== null) {
+            const startIndex = match.index;
+            const endIndex = match.index + match[0].length;
+            const potentialRef = match[0];
+            const bookPart = match[1];
+            
+            // Check if this could be a Bible book using our more flexible function
+            if (isRecognisedBook(bookPart)) {
+                allMatches.push({
+                    startIndex,
+                    endIndex,
+                    potentialRef,
+                    bookPart,
+                    patternIndex: i, // Lower index = higher priority (more specific patterns first)
+                    rangeKey: `${startIndex}-${endIndex}`
+                });
+            }
+        }
+    }
+    
+    // Sort by position and priority (more specific patterns first)
+    allMatches.sort((a, b) => {
+        if (a.startIndex !== b.startIndex) {
+            return a.startIndex - b.startIndex; // Sort by position first
+        }
+        return a.patternIndex - b.patternIndex; // Then by pattern priority
+    });
+    
+    // Process matches, avoiding overlaps
+    
+    for (const match of allMatches) {
+        // Skip if this range overlaps with something already processed
+        const hasOverlap = Array.from(processedRanges).some(rangeKey => {
+            const [rangeStart, rangeEnd] = rangeKey.split('-').map(Number);
+            return !(match.endIndex <= rangeStart || rangeEnd <= match.startIndex);
+        });
+        
+        if (hasOverlap) {
+            continue;
+        }
+        
+        logger.debug(`Found potential Bible reference: ${match.potentialRef} with book: ${match.bookPart}`);
+        
+        try {
+            // Try to parse using our expandBibleVerses function
+            const osisRefs = expandBibleVerses([match.potentialRef]);
+            
+            if (osisRefs && osisRefs.length > 0) {
+                let replacement;
+                let rangeReference;
+                
+                if (osisRefs.length === 1) {
+                    replacement = osisRefs[0];
+                    rangeReference = osisRefs[0];
+                } else {
+                    // Create a range from first to last verse
+                    replacement = `${osisRefs[0]}-${osisRefs[osisRefs.length - 1]}`;
+                    rangeReference = replacement;
+                }
+                
+                // Add the range reference (not individual verses) to our tracking list
+                foundReferences.push(rangeReference);
+                
+                // Find the position in the current result string
+                const resultStartIndex = result.indexOf(match.potentialRef);
+                if (resultStartIndex !== -1) {
+                    const resultEndIndex = resultStartIndex + match.potentialRef.length;
+                    logger.debug(`Replacing custom match "${match.potentialRef}" with "${replacement}"`);
+                    result = result.substring(0, resultStartIndex) + replacement + result.substring(resultEndIndex);
+                    
+                    // Mark this range as processed
+                    processedRanges.add(match.rangeKey);
+                }
+            }
+        } catch (error) {
+            logger.debug(`Failed to process custom match: ${match.potentialRef}`, error);
+        }
+    }
+    
+    // Step 2: Use bcv_parser as fallback for any remaining unprocessed references
+    const originalBookStrategy = bcv.options.book_alone_strategy;
+    bcv.options.book_alone_strategy = 'include';
+
+    try {
+        // Check if there are any unprocessed references that bcv might catch
+        const parsed = bcv.parse(result);
+        const entities = parsed.entities || [];
+        
+        logger.debug(`BCV found ${entities.length} additional Bible references`);
+        
+        if (entities.length > 0) {
+            // Sort entities by their position in the text (reverse order to replace from end to beginning)
+            const sortedEntities = entities.sort((a, b) => b.absolute_indices[0] - a.absolute_indices[0]);
+            
+            // Replace each bcv entity with its OSIS reference
+            for (const entity of sortedEntities) {
+                const startIndex = entity.absolute_indices[0];
+                const endIndex = entity.absolute_indices[1];
+                const originalRef = result.substring(startIndex, endIndex);
+                
+                logger.debug(`Processing BCV fallback entity: ${originalRef} at indices ${startIndex}-${endIndex}`);
+                
+                try {
+                    // Get the OSIS reference for this entity
+                    const osisRef = bcv.parse(originalRef).osis();
+                    
+                    if (osisRef) {
+                        // Parse the OSIS reference to get individual verses
+                        const osisRefs = expandBibleVerses([osisRef]);
+                        
+                        if (osisRefs && osisRefs.length > 0) {
+                            let replacement;
+                            let rangeReference;
+                            
+                            if (osisRefs.length === 1) {
+                                replacement = osisRefs[0];
+                                rangeReference = osisRefs[0];
+                            } else {
+                                // Create a range from first to last verse
+                                replacement = `${osisRefs[0]}-${osisRefs[osisRefs.length - 1]}`;
+                                rangeReference = replacement;
+                            }
+                            
+                            // Add the range reference (not individual verses) to our tracking list
+                            foundReferences.push(rangeReference);
+                            
+                            logger.debug(`Replacing BCV fallback "${originalRef}" with "${replacement}"`);
+                            result = result.substring(0, startIndex) + replacement + result.substring(endIndex);
+                        }
+                    }
+                } catch (error) {
+                    logger.debug(`Failed to process BCV fallback entity: ${originalRef}`, error);
+                }
+            }
+        }
+        
+        // Remove duplicates from foundReferences and sort them naturally for Bible references
+        const uniqueReferences = [...new Set(foundReferences)].sort((a, b) => {
+            // Extract book, chapter, and verse for natural sorting (handles ranges)
+            const parseRef = (ref) => {
+                // Handle ranges by taking the first part
+                const startRef = ref.split('-')[0];
+                const parts = startRef.split('.');
+                return {
+                    book: parts[0],
+                    chapter: parseInt(parts[1]) || 0,
+                    verse: parseInt(parts[2]) || 0
+                };
+            };
+            
+            const aRef = parseRef(a);
+            const bRef = parseRef(b);
+            
+            // First sort by book
+            if (aRef.book !== bRef.book) {
+                return aRef.book.localeCompare(bRef.book);
+            }
+            
+            // Then by chapter
+            if (aRef.chapter !== bRef.chapter) {
+                return aRef.chapter - bRef.chapter;
+            }
+            
+            // Finally by verse
+            return aRef.verse - bRef.verse;
+        });
+        
+        return {
+            text: result,
+            references: uniqueReferences
+        };
+    } finally {
+        // Restore original book strategy
+        bcv.options.book_alone_strategy = originalBookStrategy;
+    }
+}
+
 
 export { 
-    parseBibleVerses,
+    expandBibleVerses,
     convertOsisChapterToOsisRefs,
     convertOsisRangeToOsisRefs,
-    expandOsisRef
+    expandOsisRef,
+    parseTextForBibleVerses,
+    isRecognisedBook
 };

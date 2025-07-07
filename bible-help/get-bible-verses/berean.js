@@ -2,7 +2,7 @@ import berean_verses from "./data/berean/berean_verses.json" with { type: "json"
 import berean_originaltext from "./data/berean/berean_originaltext.json" with { type: "json" };
 import berean_transliteration from "./data/berean/berean_transliteration.json" with { type: "json" };
 import logger from "./logger.js";
-import { parseBibleVerses } from "@bible-help/parse-bible-verses";
+import { expandBibleVerses } from "@bible-help/parse-bible-verses";
 import { getIndexFromOsisRef } from "@bible-help/chapters-and-verses-in-bible-books";
 
 const berean_translit = berean_transliteration['berean-transliteration'];
@@ -15,7 +15,7 @@ const berean_original = berean_originaltext['berean-original-language'];
  * @returns {Promise<Verse[]>} A promise resolving to an array of Bible verse objects
  */
 function getListBibleVerses(listOsisRanges, language = "english") {
-    const indexes = parseBibleVerses(listOsisRanges, language);
+    const indexes = expandBibleVerses(listOsisRanges, language);
     
     if (!indexes) {
         return null;
@@ -32,7 +32,7 @@ function getListBibleVerses(listOsisRanges, language = "english") {
  * @returns {Promise<Verse[]>} A promise resolving to an array of Bible verse objects
  */
 function getBibleVerses(osisRange, language = "english") {
-    const indexes = parseBibleVerses([osisRange], language);
+    const indexes = expandBibleVerses([osisRange], language);
 
     return indexes.map((index) => {
         /**
@@ -52,7 +52,7 @@ function getBibleVerses(osisRange, language = "english") {
  * @returns {Promise<Verse[]>} A promise resolving to an array of Bible verse objects
  */
 function getOriginalTextVerses(osisRange) {
-    const indexes = parseBibleVerses([osisRange]);
+    const indexes = expandBibleVerses([osisRange]);
 
     logger.info(`Indexes: ${indexes}`);
 
@@ -74,7 +74,7 @@ function getOriginalTextVerses(osisRange) {
  * @returns {Promise<Verse[]>} A promise resolving to an array of Bible verse objects
  */
 function getTransliteratedVerses(osisRange) {
-    const indexes = parseBibleVerses([osisRange]);
+    const indexes = expandBibleVerses([osisRange]);
 
     logger.info(`Indexes: ${indexes}`);
 

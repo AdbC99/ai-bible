@@ -1,9 +1,9 @@
-import { parseBibleVerses, expandOsisRef, convertOsisRangeToOsisRefs } from "./parser.js";
+import { expandBibleVerses, expandOsisRef, convertOsisRangeToOsisRefs, parseTextForBibleVerses, isRecognisedBook } from "./parser.js";
 
 describe("parser.js", () => {
-    describe("parseBibleVerses", () => {
+    describe("expandBibleVerses", () => {
         test("should return array of OSIS references for valid input", () => {
-            const result = parseBibleVerses(["Gen.1.1-3"]);
+            const result = expandBibleVerses(["Gen.1.1-3"]);
             expect(result).toStrictEqual([
                 "Gen.1.1",
                 "Gen.1.2", 
@@ -12,12 +12,12 @@ describe("parser.js", () => {
         });
 
         test("should handle single verse reference", () => {
-            const result = parseBibleVerses(["Gen.1.1"]);
+            const result = expandBibleVerses(["Gen.1.1"]);
             expect(result).toStrictEqual(["Gen.1.1"]);
         });
 
         test("should handle multiple verse ranges", () => {
-            const result = parseBibleVerses(["Gen.1.1-2", "Gen.1.4"]);
+            const result = expandBibleVerses(["Gen.1.1-2", "Gen.1.4"]);
             expect(result).toStrictEqual([
                 "Gen.1.1",
                 "Gen.1.2",
@@ -26,7 +26,7 @@ describe("parser.js", () => {
         });
 
         test("should handle multiple verse ranges of different formats", () => {
-            const result = parseBibleVerses(["Gen.1.1-2", "Matthew 1:1", "Heb.1.1-Heb.1.2"]);
+            const result = expandBibleVerses(["Gen.1.1-2", "Matthew 1:1", "Heb.1.1-Heb.1.2"]);
             expect(result).toStrictEqual([
                 "Gen.1.1",
                 "Gen.1.2",
@@ -37,17 +37,17 @@ describe("parser.js", () => {
         });
 
         test("should return null for invalid input", () => {
-            const result = parseBibleVerses(null);
+            const result = expandBibleVerses(null);
             expect(result).toBeNull();
         });
 
         test("should handle string input", () => {
-            const result = parseBibleVerses("Gen.1.1");
+            const result = expandBibleVerses("Gen.1.1");
             expect(result).toStrictEqual(["Gen.1.1"]);
         });
 
         test("should handle JSON string input", () => {
-            const result = parseBibleVerses('["Gen.1.1", "Gen.1.2"]');
+            const result = expandBibleVerses('["Gen.1.1", "Gen.1.2"]');
             expect(result).toStrictEqual(["Gen.1.1", "Gen.1.2"]);
         });
     });
@@ -213,6 +213,143 @@ describe("parser.js", () => {
             expect(convertOsisRangeToOsisRefs("Pss.3-3.1")).toEqual(["Ps.3.1"]);
             expect(convertOsisRangeToOsisRefs("psalms.3-3.1")).toEqual(["Ps.3.1"]);
             expect(convertOsisRangeToOsisRefs("genessis.3-3.1")).toEqual(["Gen.3.1"]);
+        });
+    });
+
+    describe("parseTextForBibleVerses", () => {
+        test("should replace Bible verse references with OSIS format and return references", () => {
+            const text = "Read John 3:16 for hope.";
+            const result = parseTextForBibleVerses(text);
+            expect(result.text).toBe("Read John.3.16 for hope.");
+            expect(result.references).toEqual(["John.3.16"]);
+        });
+
+        test("should handle multiple Bible references", () => {
+            const text = "Compare John 3:16 with Matt 5:3-4.";
+            const result = parseTextForBibleVerses(text);
+            expect(result.text).toBe("Compare John.3.16 with Matt.5.3-Matt.5.4.");
+            expect(result.references).toEqual(["John.3.16", "Matt.5.3-Matt.5.4"]);
+        });
+
+        test("should handle book name only when standalone", () => {
+            const text = "Genesis has 50 chapters.";
+            const result = parseTextForBibleVerses(text);
+            expect(result.text).toBe("Gen.1.1-Gen.50.26 has 50 chapters.");
+            expect(result.references).toEqual(["Gen.1.1-Gen.50.26"]);
+        });
+
+        test("should handle chapter references", () => {
+            const text = "Matthew 5 contains the Beatitudes.";
+            const result = parseTextForBibleVerses(text);
+            expect(result.text).toBe("Matt.5.1-Matt.5.48 contains the Beatitudes.");
+            expect(result.references).toEqual(["Matt.5.1-Matt.5.48"]);
+        });
+
+        test("should handle dot notation", () => {
+            const text = "See Gen.1.1 for the beginning.";
+            const result = parseTextForBibleVerses(text);
+            expect(result.text).toBe("See Gen.1.1 for the beginning.");
+            expect(result.references).toEqual(["Gen.1.1"]);
+        });
+
+        test("should handle numbered books", () => {
+            const text = "1 John 2:1 speaks of advocacy.";
+            const result = parseTextForBibleVerses(text);
+            expect(result.text).toBe("1John.2.1 speaks of advocacy.");
+            expect(result.references).toEqual(["1John.2.1"]);
+        });
+
+        test("should return original text if no Bible references found", () => {
+            const text = "This document contains no Bible references.";
+            const result = parseTextForBibleVerses(text);
+            expect(result.text).toBe("This document contains no Bible references.");
+            expect(result.references).toEqual([]);
+        });
+
+        test("should handle invalid input gracefully", () => {
+            expect(parseTextForBibleVerses(null)).toEqual({ text: null, references: [] });
+            expect(parseTextForBibleVerses(undefined)).toEqual({ text: undefined, references: [] });
+            expect(parseTextForBibleVerses("")).toEqual({ text: "", references: [] });
+        });
+
+        test("should preserve non-Bible references", () => {
+            const text = "Chapter 3 of my book mentions John 3:16.";
+            const result = parseTextForBibleVerses(text);
+            expect(result.text).toBe("Chapter 3 of my book mentions John.3.16.");
+            expect(result.references).toEqual(["John.3.16"]);
+        });
+
+        test("should handle book name variations that bcv might miss", () => {
+            const text = "Read Psalms for comfort.";
+            const result = parseTextForBibleVerses(text);
+            expect(result.text).toBe("Read Ps.1.1-Ps.150.6 for comfort.");
+            expect(result.references).toEqual(["Ps.1.1-Ps.150.6"]);
+        });
+
+        test("should handle book name variations with context", () => {
+            const text = "Read from Psalms 23 for comfort.";
+            const result = parseTextForBibleVerses(text);
+            expect(result.text).toBe("Read from Ps.23.1-Ps.23.6 for comfort.");
+            expect(result.references).toEqual(["Ps.23.1-Ps.23.6"]);
+        });
+
+        test("should work with both bcv and custom patterns", () => {
+            const text = "Compare John 3:16 with Psalms for comfort.";
+            const result = parseTextForBibleVerses(text);
+            expect(result.text).toBe("Compare John.3.16 with Ps.1.1-Ps.150.6 for comfort.");
+            expect(result.references).toEqual(["John.3.16", "Ps.1.1-Ps.150.6"]);
+        });
+    });
+
+    describe("isRecognisedBook", () => {
+        test("should recognise valid OSIS book codes", () => {
+            expect(isRecognisedBook("Gen")).toBe(true);
+            expect(isRecognisedBook("John")).toBe(true);
+            expect(isRecognisedBook("1John")).toBe(true);
+            expect(isRecognisedBook("Rev")).toBe(true);
+        });
+
+        test("should recognise full book names", () => {
+            expect(isRecognisedBook("Genesis")).toBe(true);
+            expect(isRecognisedBook("Matthew")).toBe(true);
+            expect(isRecognisedBook("Revelation")).toBe(true);
+            expect(isRecognisedBook("1 John")).toBe(true);
+        });
+
+        test("should recognise common abbreviations", () => {
+            expect(isRecognisedBook("Matt")).toBe(true);
+            expect(isRecognisedBook("Rom")).toBe(true);
+            expect(isRecognisedBook("Ps")).toBe(true);
+        });
+
+        test("should recognise book name overrides/misspellings", () => {
+            expect(isRecognisedBook("Psalms")).toBe(true);
+            expect(isRecognisedBook("Pss")).toBe(true);
+        });
+
+        test("should handle case variations", () => {
+            expect(isRecognisedBook("genesis")).toBe(true);
+            expect(isRecognisedBook("JOHN")).toBe(true);
+            expect(isRecognisedBook("MaTtHeW")).toBe(true);
+        });
+
+        test("should return false for invalid book names", () => {
+            expect(isRecognisedBook("InvalidBook")).toBe(false);
+            expect(isRecognisedBook("NotABook")).toBe(false);
+            expect(isRecognisedBook("")).toBe(false);
+            expect(isRecognisedBook("123")).toBe(false);
+        });
+
+        test("should handle invalid input gracefully", () => {
+            expect(isRecognisedBook(null)).toBe(false);
+            expect(isRecognisedBook(undefined)).toBe(false);
+            expect(isRecognisedBook(123)).toBe(false);
+            expect(isRecognisedBook({})).toBe(false);
+        });
+
+        test("should work with book names that have extra formatting", () => {
+            expect(isRecognisedBook("John 3:16")).toBe(true); // Should extract "John"
+            expect(isRecognisedBook("Genesis.1.1")).toBe(true); // Should extract "Genesis"
         });
     });
 });

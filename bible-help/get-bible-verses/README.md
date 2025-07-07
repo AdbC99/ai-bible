@@ -42,7 +42,8 @@ npm install @bible-help/get-bible-verses
 ## Usage
 
 ``` typescript
-import { getListBibleVerses, parseBibleVerses } from "@bible-help/get-bible-verses";
+import { getListBibleVerses } from "@bible-help/get-bible-verses";
+import { expandBibleVerses } from "@bible-help/parse-bible-verses";
 
 // Get verses in English (default)
 const verses = getListBibleVerses(["Gen.1.1", "John.3.16", "Matt.5.6"]);
@@ -54,7 +55,7 @@ console.log(verses);
 // ]
 
 // Parse references to get individual verse list
-const references = parseBibleVerses(["Gen.1.1-3", "John.3.16"]);
+const references = expandBibleVerses(["Gen.1.1-3", "John.3.16"]);
 console.log(references);
 // Output: ["Gen.1.1", "Gen.1.2", "Gen.1.3", "John.3.16"]
 

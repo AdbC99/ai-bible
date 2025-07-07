@@ -1,6 +1,7 @@
 export { 
-    parseBibleVerses,
+    expandBibleVerses,
     convertOsisChapterToOsisRefs,
     convertOsisRangeToOsisRefs,
-    expandOsisRef
+    expandOsisRef,
+    parseTextForBibleVerses
 } from './parser.js';
