@@ -1,0 +1,43 @@
+{
+  "name": "@bible-help/chapters-and-verses-in-bible-books",
+  "version": "1.0.0",
+  "description": "Bible verse services for AI Bible applications",
+  "repository": "https://github.com/AdbC99/ai-bible",
+  "homepage": "http://ai-bible.com/labs",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules ./node_modules/.bin/jest --config jest.config.js"
+  },
+  "dependencies": {
+    "bible-passage-reference-parser": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.15.17",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.3.4"
+  },
+  "jest": {
+    "preset": "ts-jest/presets/default-esm",
+    "extensionsToTreatAsEsm": [
+      ".ts",
+      ".tsx"
+    ],
+    "globals": {
+      "ts-jest": {
+        "useESM": true
+      }
+    },
+    "moduleNameMapping": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    }
+  },
+  "keywords": [
+    "bible",
+    "books",
+    "osis"
+  ],
+  "author": "Alistair de Blacquiere-Clarkson",
+  "license": "MIT"
+}
