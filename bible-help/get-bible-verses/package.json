@@ -1,6 +1,6 @@
 {
   "name": "@bible-help/get-bible-verses",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Bible verse services for AI Bible applications",
   "repository": "https://github.com/AdbC99/ai-bible",
   "homepage": "http://ai-bible.com/labs",
@@ -41,5 +41,5 @@
     "mcp"
   ],
   "author": "Alistair de Blacquiere-Clarkson",
-  "license": "ISC"
+  "license": "MIT"
 }

@@ -1,42 +1,12 @@
 import berean_verses from "./data/berean/berean_verses.json" with { type: "json" };
 import berean_originaltext from "./data/berean/berean_originaltext.json" with { type: "json" };
 import berean_transliteration from "./data/berean/berean_transliteration.json" with { type: "json" };
-import * as converters from "./converters.js";
+import { convertOsisRefToIndex } from "./converters.js";
 import logger from "./logger.js";
 import { parseBibleVerses } from "@bible-help/parse-bible-verses";
 
 const berean_translit = berean_transliteration['berean-transliteration'];
 const berean_original = berean_originaltext['berean-original-language'];
-
-
-
-
-
-function ensureProperEncoding(text) {
-    // Check if text is properly encoded
-    try {
-        // Test for Hebrew characters
-        const hasHebrew = /[\u0590-\u05FF]/.test(text);
-        const hasGreek = /[\u0370-\u03FF\u1F00-\u1FFF]/.test(text);
-        
-        if (hasHebrew || hasGreek) {
-            return text; // Already properly encoded
-        }
-        
-        // If it's Unicode escaped, decode it
-        if (/\\u[0-9a-fA-F]{4}/.test(text)) {
-            return JSON.parse(`"${text}"`);
-        }
-        
-        return text;
-    } catch (error) {
-        console.warn('Encoding issue:', error);
-        return text;
-    }
-}
-
-
-
 
 /**
  * Retrieves a list of Bible verses based on an OSIS range.
@@ -62,7 +32,7 @@ function getListBibleVerses(listOsisRanges, language = "english") {
  * @returns {Promise<Verse[]>} A promise resolving to an array of Bible verse objects
  */
 function getBibleVerses(osisRange, language = "english") {
-    const indexes = converters.convertOsisRangeToOsisRefs(osisRange);
+    const indexes = parseBibleVerses([osisRange], language);
 
     return indexes.map((index) => {
         /**
@@ -82,7 +52,7 @@ function getBibleVerses(osisRange, language = "english") {
  * @returns {Promise<Verse[]>} A promise resolving to an array of Bible verse objects
  */
 function getOriginalTextVerses(osisRange) {
-    const indexes = converters.convertOsisRangeToOsisRefs(osisRange);
+    const indexes = parseBibleVerses([osisRange]);
 
     logger.info(`Indexes: ${indexes}`);
 
@@ -104,7 +74,7 @@ function getOriginalTextVerses(osisRange) {
  * @returns {Promise<Verse[]>} A promise resolving to an array of Bible verse objects
  */
 function getTransliteratedVerses(osisRange) {
-    const indexes = converters.convertOsisRangeToOsisRefs(osisRange);
+    const indexes = parseBibleVerses([osisRange]);
 
     logger.info(`Indexes: ${indexes}`);
 
@@ -126,7 +96,7 @@ function getTransliteratedVerses(osisRange) {
  * @returns {string|null} A bible verse as text, or null if not found
  */
 function getBibleVerse(osisRef, language = "english") {
-    const index = converters.convertOsisRefToIndex(osisRef);
+    const index = convertOsisRefToIndex(osisRef);
 
     switch (language.toLowerCase()) {
         case "english":
@@ -150,7 +120,7 @@ function getBibleVerse(osisRef, language = "english") {
  * @returns {string|null} A bible verse as text, or null if not found
  */
 function getOriginalTextVerse(osisRef) {
-    const index = converters.convertOsisRefToIndex(osisRef);
+    const index = convertOsisRefToIndex(osisRef);
     let verse = berean_original[index] || null;
 
     if (verse)
@@ -166,7 +136,7 @@ function getOriginalTextVerse(osisRef) {
  * @returns {string|null} A bible verse as text, or null if not found
  */
 function getTransliteratedVerse(osisRef) {
-    const index = converters.convertOsisRefToIndex(osisRef);
+    const index = convertOsisRefToIndex(osisRef);
     let verse = berean_translit[index] || null;
 
     if (verse)

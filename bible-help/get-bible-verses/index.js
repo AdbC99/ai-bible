@@ -1,1 +1,1 @@
-export { getListBibleVerses, getBibleVerse, parseBibleVerses } from './berean.js';
+export { getListBibleVerses, getBibleVerse } from './berean.js';
