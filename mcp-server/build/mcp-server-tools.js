@@ -1,4 +1,4 @@
-import { getBibleVerses, getListBibleVerses, getOriginalTextVerses, getTransliteratedVerses, } from "../../bible-help/get-bible-verses/index.js";
+import { getListBibleVerses, } from "@bible-help/get-bible-verses";
 import logger from "./services/logger.js";
 import { z } from "zod";
 /**
@@ -79,4 +79,4 @@ const addGetBibleVersesOriginalOnly = (server) => {
         };
     });
 };
-export { addGetBibleVerses, addGetBibleVersesOriginalOnly, getBibleVerses, getListBibleVerses, getOriginalTextVerses, getTransliteratedVerses, };
+export { addGetBibleVerses, addGetBibleVersesOriginalOnly };

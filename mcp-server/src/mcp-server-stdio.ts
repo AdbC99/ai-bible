@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { addGetBibleVerses, addGetBibleVersesOriginalOnly } from "./mcp-server-tools.js";
+import { addGetBibleVerses } from "./mcp-server-tools.js";
 
 /**
  * Creates a new instance of the MCP server.

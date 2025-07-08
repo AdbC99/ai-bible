@@ -1,7 +1,6 @@
 import {
-    getBibleVerses,
     getListBibleVerses,
-} from "../../bible-help/get-bible-verses/index.js";
+} from "@bible-help/get-bible-verses";
 import logger from "./services/logger.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
@@ -113,7 +112,5 @@ const addGetBibleVersesOriginalOnly = (server: McpServer) => {
 
 export {
     addGetBibleVerses,
-    addGetBibleVersesOriginalOnly,
-    getBibleVerses,
-    getListBibleVerses,
+    addGetBibleVersesOriginalOnly
 };
