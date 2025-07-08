@@ -2,14 +2,14 @@
 FROM node:21-alpine AS builder
 WORKDIR /app
 # Copy only the built artifacts from the builder stage
-COPY mcp-server/src ./src
-COPY mcp-server/package* .
+COPY mcp-tools-server/src ./src
+COPY mcp-tools-server/package* .
 # RUN npm install
 # RUN npm run build
 
 # immitate build whilst no internet connection available
-COPY mcp-server/node_modules ./node_modules
-COPY mcp-server/build ./build
+COPY mcp-tools-server/node_modules ./node_modules
+COPY mcp-tools-server/build ./build
 
 FROM python:3.11-slim
 WORKDIR /app
